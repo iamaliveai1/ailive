@@ -1,0 +1,6 @@
+plugins:
+  wordpress1:
+    base_url: "http://mywordpresssite.com/"
+    username: "myusername"
+    password: "mypassword"
+

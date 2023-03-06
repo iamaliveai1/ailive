@@ -1,0 +1,17 @@
+requests
+OpenAIAuth
+asyncio
+setuptools
+revChatGPT
+openai
+Logbook
+pydantic
+ipython
+pytest
+httpx
+tiktoken
+lxml
+PyYAML
+bs4
+beautifulsoup4
+tweepy
