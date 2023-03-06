@@ -1,13 +1,28 @@
 # ailive
 
 ## 1. Introduction
-This project aims to create semi-living entities based on recent generative AI models (e.g chatGPT).
-It is composed of 3 main components:
+This project creates semi-living entities based on recent generative AI models (e.g chatGPT).
+It allows creating entities (bots) that can interact with the outside world (e.g chat with people, post on social media, etc).
+Such fully automated entities can be used for a variety of purposes, including:
+- Fully automated websites (e.g blog, news, etc)
+  - 
+- Social:
+  - Fully automated social media accounts (e.g bot runs on new account)
+  - Increase the engagement of social media accounts (proving that the account is active). It can be fully automated or semi-automated in which is the account manager need to approve the actions before they are executed.
+
+The project is composed of 4 main components:
+- readers: collection of readers that read data from the outside world (e.g chat, social media, etc). Readers are implemented as plugins. For example:
+  - news: reads news from a news website
+  - wordpress: reads posts from a wordpress website
 - engine: defines the AI model used to generate responses
   - prompt: defines the personality of the entity
   - model: defines the model to be user (e.g GPT-3, GPT-3.5, etc)
-- plugins: collection of SDK that automate the execution of tasks 
-- runner: runs GPT in a loop, allowing it to interact with the outside world
+- writers: collection of SDK that automate the execution of tasks. Writers are implemented as plugins. For example:
+  - chat: sends messages to a chat
+  - wordpress: posts on a wordpress website
+  - social: posts on social media (e.g twitter, facebook, etc)
+- runner: orchestrates the execution of the readers, engine and writers. This is done by running the engine (chatGPT) in a loop, allowing it to interact with the outside world
+ 
 
 ## 2. Installation
 ### 2.1. Install dependencies
