@@ -15,3 +15,7 @@ PyYAML
 bs4
 beautifulsoup4
 tweepy
+dynaconf
+cssselect
+munch
+feedparser
