@@ -1,4 +1,19 @@
-# ailive
+<p align="center">
+   <a href="https://github.com/roeiba">
+    <img src="https://i0.wp.com/www.salafiri.com/wp-content/uploads/2015/07/space.jpg?resize=310%2C165&ssl=1" width="800"> </a>
+    </p>
+
+
+<div align="center">
+    <img
+        src="https://readme-typing-svg.herokuapp.com?font=ShadowsIntoLightsize=50&duration=5500&color=fc7b03&background=FF673200&center=true&vCenter=true&lines=Hello+I+Am+Alive"
+            alt="Typing SVG"
+        />
+    </a>
+</p>
+</div>
+
+# A-Live
 
 ## 1. Introduction
 Have you ever dreamed of running a website that requires no manual intervention, yet is able to generate posts, interact with visitors, and even make sales on your behalf? Well, with the latest advancements in artificial intelligence (AI), that dream is now a reality.
