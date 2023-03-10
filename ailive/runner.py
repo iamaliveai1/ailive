@@ -153,7 +153,7 @@ class AiLive:
 
 def _load_plugins():
     plugins = []
-    wp_config = settings.plugins_secrets.wordpress1
+    wp_config = settings.plugins.wordpress1
     wordpress_plugin = WordPressAlivePlugin(
         base_url=wp_config.base_url,
         username=wp_config.username,
