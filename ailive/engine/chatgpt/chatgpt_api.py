@@ -73,6 +73,9 @@ def ask_gpt_long_content(content: list, prompt, delete_conversation=True):
 
 
 def _ask_gpt_long_content(prompt, content, max_request_size=1500):
+    total_length = sum([len(s) for s in content])
+    _logger.info(f"total content length {total_length} and max_request_size {max_request_size}")
+    _logger.info("expecting " + str(total_length / max_request_size) + " requests")
     result = []
     for group_string in _get_next_group(content, max_request_size):
         result.append(ask_gpt(prompt + group_string))
@@ -83,7 +86,6 @@ def _get_next_group(content: list[str], max_request_size: int):
     """
     this method groups strings from `content` such that the total result will be less than max_request_size
     :param content:
-    :param i:
     :param max_request_size:
     :return:
     """
@@ -133,7 +135,7 @@ def _slice_partial_content(content, max_request_size):
 
 def ask_gpt(prompt, chatbot=None, attempts=2):
     _logger.info(f"===================\n")
-    _logger.info(f"Asking GPT:\n{prompt[:100]}")
+    _logger.info(f"Asking GPT:\n{prompt}")
     _wait_on_rate_limit()
     try:
         if chatbot is None:
@@ -156,7 +158,7 @@ def ask_gpt(prompt, chatbot=None, attempts=2):
             f"-------------------\n"
             f"content len: {len(prompt)}\n"
             f"answer len: {len(answer)}\n"
-            f"answer: {answer[:50]}...\n"
+            f"answer: {answer}...\n"
             f"===================")
         return answer
     except Error as e:
@@ -187,7 +189,7 @@ def ask_gpt(prompt, chatbot=None, attempts=2):
         raise e
 
 
-def _wait_on_rate_limit(min_time_between_requests=5):
+def _wait_on_rate_limit(min_time_between_requests=120):
     """
     This method waits for min_time_between_requests seconds between requests to the ChatGPT API
     :param min_time_between_requests:
@@ -202,4 +204,5 @@ def _wait_on_rate_limit(min_time_between_requests=5):
         if wait_time > 0:
             _logger.info(f"GPT-RATE-LIMIT: waiting {wait_time} seconds")
             time.sleep(wait_time)
+            _logger.info(f"GPT-RATE-LIMIT: done waiting")
     last_request_time = time.time()
