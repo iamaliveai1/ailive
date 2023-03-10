@@ -56,7 +56,16 @@ plugins:
     username: your-username
     password: your-password
 ```
-
+If you have a running wordpress website, you can use the following steps to expose the WP API:
+- Install WP plugin: WordPress REST API Authentication
+- Configure the plugin and set to 'Basic Authentication Method'
+- Test your configuration in the plugin settings page
+In case you don't have a running wordpress website, don't worry. You easily run it using docker:
+```bash
+docker run --name some-wordpress -p 8080:80 -d wordpress
+```
+Then, you can access the wordpress website at http://localhost:8080
+ 
 
 ## 3. Usage
 ### 3.1. Run the server
@@ -65,7 +74,11 @@ python ailive/live_ai_bot.py
 ```
 
 ## 4. Testing
-### 4.1. Run the tests
+### 4.1. Run the tests with mock GPT
 ```bash
-pytest tests
+MOCK_GPT=true pytest -s tests/ 
+```
+### 4.2. Run the tests with real GPT
+```bash
+pytest -s tests/ 
 ```
