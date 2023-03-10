@@ -1,6 +1,6 @@
 def get_mock_chatbot():
     # return MockChatbot()
-    return MockSocialChatbot()
+    return MockChatbot()
 
 
 class MockChatbot:
@@ -21,7 +21,7 @@ class MockChatbot:
         :return:
         """
         return [
-            {"message": "mocked answer", "conversation_id": self.conversation_id, "parent_id": self.parent_id},
+            {"message": prompt, "conversation_id": self.conversation_id, "parent_id": self.parent_id},
         ]
 
     def delete_conversation(self, conversation_id):
