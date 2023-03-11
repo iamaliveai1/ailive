@@ -1,3 +1,4 @@
+from abc import ABCMeta, abstractmethod
 from datetime import datetime
 from time import sleep
 
@@ -5,19 +6,14 @@ import logbook
 
 from ailive.actions.executors import execute_social_media_func
 from ailive.actions.plugins.base import AlivePlugin
-from ailive.actions.plugins.news import AliveNewsPlugin
-from ailive.actions.plugins.wordpress import WordPressAlivePlugin
-from ailive.config import settings
 from ailive.engine.chatgpt.chatgpt_api import ask_gpt
 from ailive.engine.chatgpt.extractor import extract_args
-from ailive.engine.chatgpt.prompts.news_prompts import commentariat_prompt_snappy
-from ailive.infra import log_config  # noqa: F401
 from revChatGPT.V1 import Error
 
 _logger = logbook.Logger(__name__)
 
 
-class AiLive:
+class AiLive(metaclass=ABCMeta):
 
     def __init__(self, prompt, sleep_seconds=10):
         self.prompt = prompt
@@ -28,11 +24,21 @@ class AiLive:
         self.last_notifications = []
         self.new_journal_size_threshold = 0
         self.prompts_initialized = False
+        self.register_plugins(self.get_plugins())
+
+    @abstractmethod
+    def get_plugins(self):
+        """
+        This method should be implemented by the child class
+        It handles the plugins loading, thus defining the behavior of the application
+        :return:
+        """
+        raise NotImplementedError
 
     def register_plugin(self, plugin: AlivePlugin):
         self.plugins.append(plugin)
 
-    def register_plugins(self, plugin: list):
+    def register_plugins(self, plugin: list[AlivePlugin]):
         self.plugins.extend(plugin)
 
     def unregister_plugin(self, plugin: AlivePlugin):
@@ -46,6 +52,10 @@ class AiLive:
             except (ValueError, Error) as e:
                 _logger.error(f"error: {e}", exc_info=True)
                 self._sleep()
+            # accept KeyboardInterrupt
+            except KeyboardInterrupt:
+                _logger.info("stopping AiLive application")
+                break
 
     def run_once(self):
         if not self.prompts_initialized:
@@ -149,28 +159,3 @@ class AiLive:
     def update_journal(self, message):
         _logger.info(f"updating internal journal with {message}")
         self.journal.append(message)
-
-
-def _load_plugins():
-    plugins = []
-    wp_config = settings.plugins.wordpress1
-    wordpress_plugin = WordPressAlivePlugin(
-        base_url=wp_config.base_url,
-        username=wp_config.username,
-        password=wp_config.password,
-    )
-    plugins.append(wordpress_plugin)
-    news_plugin = AliveNewsPlugin()
-    plugins.append(news_plugin)
-    return plugins
-
-
-def main():
-    plugins = _load_plugins()
-    alive_bot = AiLive(prompt=commentariat_prompt_snappy, sleep_seconds=1)
-    alive_bot.register_plugins(plugins)
-    alive_bot.run_forever()
-
-
-if __name__ == '__main__':
-    main()

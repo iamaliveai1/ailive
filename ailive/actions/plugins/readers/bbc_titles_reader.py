@@ -7,7 +7,7 @@ from ailive.actions.plugins.base import AlivePlugin
 _logger = logbook.Logger(__name__)
 
 
-class AliveNewsPlugin(AlivePlugin):
+class AliveBBCNewsPlugin(AlivePlugin):
     def __init__(self):
         super().__init__()
         self.can_post = False

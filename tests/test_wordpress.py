@@ -1,6 +1,6 @@
 from time import sleep
 
-from ailive.actions.plugins.wordpress import WordPressAlivePlugin
+from ailive.actions.plugins.writers.wordpress import WordPressAlivePlugin
 from ailive.config import settings
 
 
