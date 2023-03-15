@@ -38,6 +38,10 @@ class AliveBBCNewsPlugin(AlivePlugin):
                 if title not in self.recently_handled_news
             ]
 
+        if not self.news:
+            _logger.info("no new news")
+            return []
+
         _logger.info(f"news: {self.news}")
         # remove and return the oldest news article title
         oldest_item = self.news.pop(0)
@@ -62,7 +66,8 @@ class AliveBBCNewsPlugin(AlivePlugin):
         titles = soup.find_all('h3', class_='gs-c-promo-heading__title')
 
         # print out the titles
+        _logger.info("titles: ")
         for title in titles:
-            print(title.get_text())
+            _logger.info(title.get_text())
 
         return [title.get_text() for title in titles]
