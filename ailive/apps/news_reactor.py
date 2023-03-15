@@ -1,3 +1,5 @@
+import os
+
 from ailive.actions.plugins.readers.bbc_titles_reader import AliveBBCNewsPlugin
 from ailive.actions.plugins.writers.wordpress import WordPressAlivePlugin
 from ailive.config import settings
@@ -16,7 +18,9 @@ class NewsReactor(AiLive):
             password=wp_config.password,
         )
         plugins.append(wordpress_plugin)
-        news_plugin = AliveBBCNewsPlugin()
+        news_plugin = AliveBBCNewsPlugin(
+            scrape_recent_news=os.environ.get("SCRAPE_RECENT_NEWS", False),
+        )
         plugins.append(news_plugin)
         return plugins
 

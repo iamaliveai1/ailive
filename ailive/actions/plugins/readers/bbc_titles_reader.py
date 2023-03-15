@@ -8,13 +8,21 @@ _logger = logbook.Logger(__name__)
 
 
 class AliveBBCNewsPlugin(AlivePlugin):
-    def __init__(self):
+    def __init__(self, scrape_recent_news=False):
+        """
+        :param scrape_recent_news: if True, the plugin will scrape all the news article titles on the page.
+        If False, it will only scrape the news article titles that were posted since plugin was started.
+        """
         super().__init__()
         self.can_post = False
         # specify the URL of the news website you want to scrape
         self.url = 'https://www.bbc.com/news'
         self.news = []
-        self.recently_handled_news = []
+        self.scrape_recent_news = scrape_recent_news
+        if self.scrape_recent_news:
+            self.recently_handled_news = []
+        else:
+            self.recently_handled_news = self._pull_titles()
 
     def get_notifications(self):
         """
