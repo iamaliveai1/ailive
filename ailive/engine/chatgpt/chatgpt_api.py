@@ -16,22 +16,29 @@ from revChatGPT.V1 import Chatbot, Error
 
 from revChatGPT.V1 import ErrorType
 from ailive.engine.chatgpt.mocks import get_mock_chatbot
+from ailive.config import settings
 
 _logger = logbook.Logger(__name__)
 
+chatgpt_cfg = settings.chatgpt
+email = chatgpt_cfg.email
+password = chatgpt_cfg.password
+
 mock = bool(os.environ.get("MOCK_GPT", False))
-email = os.environ.get("GPT_EMAIL", "")
-password = os.environ.get("GPT_PASSWORD", "")
+
 if mock is False and (not email or not password):
-    raise Exception("GPT_EMAIL and GPT_PASSWORD must be set as environment variables")
+    raise Exception("GPT_EMAIL and GPT_PASSWORD must be set!"
+                    "Place them in settings.yaml or set them as environment variables")
 
 
 def get_new_chatbot():
     if mock:
         return get_mock_chatbot()
+    print(f"Creating new chatbot with login details: {email}, {password}")
     return Chatbot(config={
-        "email": email,
-        "password": password
+        # "email": email,
+        # "password": password,
+        "access_token": chatgpt_cfg.access_token,
     })
 
 
@@ -178,10 +185,10 @@ def ask_gpt(prompt, chatbot=None, attempts=2):
             _logger.info(f"creating new chatbot")
             chatbot_wrapper.rotate_chatbot()
             retry = True
-        elif e.code == ErrorType.EMPTY_RESPONSE:
-            _logger.info(f"ERROR: {e}")
-            _logger.info(f"empty response from GPT")
-            return ""
+        # elif e.code == ErrorType.EMPTY_RESPONSE:
+        #     _logger.info(f"ERROR: {e}")
+        #     _logger.info(f"empty response from GPT")
+        #     return ""
         if retry and attempts > 0:
             _logger.info(f"retrying ask_gpt, attempts={attempts}")
             return ask_gpt(prompt, attempts=attempts - 1)
