@@ -1,0 +1,33 @@
+version: "3.9"
+# password: 5NhnWeSmq9HLy$8Sgc
+# wp plugin pass: hCneVL3SGamyUHL (designmodo.com)
+services:
+  db:
+    image: mysql:5.7
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: dbpassword
+      MYSQL_DATABASE: wordpress_local
+      MYSQL_USER: wordpress_db_user
+      MYSQL_PASSWORD: wordpress_db_password
+    platform: linux/x86_64
+
+  wordpress:
+    depends_on:
+      - db
+    image: wordpress:latest
+    volumes:
+      - wordpress_data:/var/www/html
+    ports:
+      - "8001:80"
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wordpress_db_user
+      WORDPRESS_DB_PASSWORD: wordpress_db_password
+      WORDPRESS_DB_NAME: wordpress_local
+volumes:
+  db_data: {}
+  wordpress_data: {}
