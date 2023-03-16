@@ -1,6 +1,10 @@
+chatgpt:
+  email: "email@gmail.com"
+  password: "password"
+  access_token: "<access_token>"
+
 plugins:
   wordpress1:
-    base_url: "http://mywordpresssite.com/"
-    username: "myusername"
-    password: "mypassword"
-
+    base_url: "https://localhost:8080/"
+    username: "wordpress"
+    password: "wordpress"

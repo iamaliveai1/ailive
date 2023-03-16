@@ -15,7 +15,7 @@ _logger = logbook.Logger(__name__)
 
 class AiLive(metaclass=ABCMeta):
 
-    def __init__(self, prompt, sleep_seconds=10):
+    def __init__(self, prompt, sleep_seconds=10, v_name="ChatGPT"):
         self.prompt = prompt
         self.sleep_seconds = sleep_seconds
         self.iteration = 0
@@ -25,6 +25,7 @@ class AiLive(metaclass=ABCMeta):
         self.new_journal_size_threshold = 0
         self.prompts_initialized = False
         self.register_plugins(self.get_plugins())
+        self.v_name = v_name
 
     @abstractmethod
     def get_plugins(self):
@@ -91,7 +92,7 @@ class AiLive(metaclass=ABCMeta):
         :return:
         """
         # update the journal with gpt response
-        self.update_journal(message=f"GPT Response:\n{answer}")
+        self.update_journal(message=f"{answer}")
         # count the total number of words in the journal
         total_words = sum([len(message.split()) for message in self.journal])
         if total_words > self.new_journal_size_threshold:
@@ -150,7 +151,7 @@ class AiLive(metaclass=ABCMeta):
         for plugin in self.plugins:
             if plugin.can_post:
                 notifications_str = "\n".join(self.last_notifications)
-                title = f'{datetime.now().strftime("%Y-%m-%d %H:%M")} GPT Reacts to "{notifications_str}"'
+                title = f'{datetime.now().strftime("%Y-%m-%d %H:%M")} {self.v_name} Reacts to "{notifications_str}"'
                 plugin.create_post(
                     title=title,
                     content="<br><br>".join(self.journal)

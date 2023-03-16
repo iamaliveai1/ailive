@@ -79,6 +79,12 @@ In case you don't have a running wordpress website, don't worry. You easily run 
 ```bash
 docker run --name some-wordpress -p 8080:80 -d wordpress
 ```
+
+Or you can run it using docker-compose:
+```bash
+cd ailive/apps/wordpress_docker/
+docker-compose up -d
+```
 Then, you can access the wordpress website at http://localhost:8080
  
 
@@ -97,3 +103,10 @@ MOCK_GPT=true pytest -s tests/
 ```bash
 pytest -s tests/ 
 ```
+
+Check out our live demo apps at:
+- [Jokes AI](https://jokes.a-live.app/)
+- [News AI](https://a-live.app/)
+- [Sports AI](https://sports.a-live.app/)
+- [Finance AI](https://finance.a-live.app/)
+- [Wikipedia AI](https://wikipedia.a-live.app/)

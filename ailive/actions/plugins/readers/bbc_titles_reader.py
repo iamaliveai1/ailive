@@ -22,7 +22,7 @@ class AliveBBCNewsPlugin(AlivePlugin):
         if self.scrape_recent_news:
             self.recently_handled_news = []
         else:
-            self.recently_handled_news = self._pull_titles()
+            self.recently_handled_news = self.pull_titles()
 
     def get_notifications(self):
         """
@@ -34,7 +34,7 @@ class AliveBBCNewsPlugin(AlivePlugin):
             # if there are no news article titles in the list, pull the latest ones
             self.news = [
                 title
-                for title in self._pull_titles()
+                for title in self.pull_titles()
                 if title not in self.recently_handled_news
             ]
 
@@ -55,7 +55,7 @@ class AliveBBCNewsPlugin(AlivePlugin):
             self.recently_handled_news = self.recently_handled_news[-20:]
         return [oldest_item]
 
-    def _pull_titles(self):
+    def pull_titles(self):
         # send a request to the website and get the HTML response
         response = requests.get(self.url)
 
@@ -63,11 +63,28 @@ class AliveBBCNewsPlugin(AlivePlugin):
         soup = BeautifulSoup(response.content, 'html.parser')
 
         # find all the news article titles on the page
-        titles = soup.find_all('h3', class_='gs-c-promo-heading__title')
+        titles = []
 
         # print out the titles
         _logger.info("titles: ")
-        for title in titles:
-            _logger.info(title.get_text())
+        for title in self.extract(soup):
+            text = title.get_text()
+            _logger.info(text)
+            titles.append(text)
 
-        return [title.get_text() for title in titles]
+        return titles
+
+    def extract(self, soup):
+        return soup.find_all('h3', class_='gs-c-promo-heading__title')
+
+
+class AliveBBCSportsPlugin(AliveBBCNewsPlugin):
+    def __init__(self, scrape_recent_news=False):
+        super().__init__(scrape_recent_news)
+        self.url = 'https://www.bbc.com/sport'
+
+    def extract(self, soup):
+        return soup.find_all('div')
+        # return soup.find_all('li')
+
+
