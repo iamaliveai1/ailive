@@ -196,7 +196,7 @@ def ask_gpt(prompt, chatbot=None, attempts=2):
         raise e
 
 
-def _wait_on_rate_limit(min_time_between_requests=120):
+def _wait_on_rate_limit(min_time_between_requests=30):
     """
     This method waits for min_time_between_requests seconds between requests to the ChatGPT API
     :param min_time_between_requests:
