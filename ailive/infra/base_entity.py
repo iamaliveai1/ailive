@@ -154,7 +154,9 @@ class AiLive(metaclass=ABCMeta):
                 title = f'{datetime.now().strftime("%Y-%m-%d %H:%M")} {self.v_name} Reacts to "{notifications_str}"'
                 plugin.create_post(
                     title=title,
-                    content="<br><br>".join(self.journal)
+                    content="<br><br>".join(self.journal),
+                    categories=[self.v_name],
+                    tags=[self.v_name],
                 )
 
     def update_journal(self, message):

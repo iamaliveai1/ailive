@@ -84,7 +84,7 @@ class AliveBBCSportsPlugin(AliveBBCNewsPlugin):
         self.url = 'https://www.bbc.com/sport'
 
     def extract(self, soup):
-        return soup.find_all('div')
-        # return soup.find_all('li')
+
+        return soup.find_all('h3.gs-c-promo-heading__title')
 
 
