@@ -17,5 +17,5 @@ class AlivePlugin(metaclass=abc.ABCMeta):
     def get_notifications(self):
         return []
 
-    def create_post(self, title, content):
+    def create_post(self, title, content, categories=None, tags=None):
         pass
