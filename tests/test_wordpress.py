@@ -1,6 +1,6 @@
 from time import sleep
 
-from ailive.actions.plugins.writers.wordpress import WordPressAlivePlugin, get_gpt_categories, get_gpt_tags
+from ailive.actions.plugins.writers.wordpress import WordPressAlivePlugin, get_gpt_metalabeling, get_gpt_tags
 from ailive.config import settings
 
 
@@ -35,7 +35,7 @@ def test_get_gpt_categories():
     
     But seriously, folks, Klopp says it's a "massive task" to get back in the Champions League. It's like trying to find a parking spot in Manhattan on a Saturday night. Good luck with that!
     """
-    categories = get_gpt_categories(content)
+    categories = get_gpt_metalabeling(content)
     assert categories
     assert len(categories) > 5
 

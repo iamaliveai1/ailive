@@ -110,14 +110,17 @@ class WordPressAlivePlugin(AlivePlugin):
             "title": title,
             "content": formatted_content,
         }
+        meta_labels = get_gpt_metalabeling(content)
+        _logger.info(f"meta_labels: {meta_labels}")
+
         categories = categories if categories else []
-        gpt_categories = get_gpt_categories(content)
+        gpt_categories = meta_labels.get("categories", [])
         all_categories = self.categories + categories + gpt_categories
         if all_categories:
             data["categories"] = self._get_categories_ids(all_categories)
 
         tags = tags if tags else []
-        gpt_tags = get_gpt_tags(content)
+        gpt_tags = meta_labels.get("tags", [])
         all_tags = self.tags + tags + gpt_tags
         if all_tags:
             data["tags"] = self._get_tags_ids(all_tags)
@@ -148,24 +151,19 @@ class WordPressAlivePlugin(AlivePlugin):
         return response
 
 
-def get_gpt_categories(content):
+def get_gpt_metalabeling(content):
     """
     Get the categories from the content
     :param content:
     :return:
     """
-    categories_prompt = "What categories do you want to add to this post? Give me the categories as a list of: catergory1, category2, … and nothing else. Post is:\n"
-    gpt_categories = ask_gpt(categories_prompt + content, chatbot=get_new_chatbot())
-    return gpt_categories.split(",")
+    smart_tags_prompt = (
+        "What categories and tags would you suggest me to add to this post? "
+        'Give me the response as json: {"categories": ["catergory1", "category2", …], "tags": ["tag1", "tag2", …]} and nothing else. ' 
+        "Post is:\n"
+    )
+    response = ask_gpt(smart_tags_prompt + content, chatbot=get_new_chatbot())
+    result = json.loads(response)
+    return result
 
-
-def get_gpt_tags(content):
-    """
-    Get the tags from the content
-    :param content:
-    :return:
-    """
-    tags_prompt = "What tags do you want to add to this post? Give me the tags as a list of: tag1, tag2, … and nothing else. Post is:\n"
-    gpt_tags = ask_gpt(tags_prompt + content, chatbot=get_new_chatbot())
-    return gpt_tags.split(",")
 
