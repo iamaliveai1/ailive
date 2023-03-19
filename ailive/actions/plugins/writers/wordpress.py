@@ -23,7 +23,6 @@ class WordPressAlivePlugin(AlivePlugin):
             "Content-Type": "application/json",
         }
         # use the chatbot to format the content
-        self.chatbot = get_new_chatbot()
         self.categories = categories if categories else []
         self.tags = tags if tags else []
         self.categories_data = []
@@ -104,7 +103,7 @@ class WordPressAlivePlugin(AlivePlugin):
 
     def create_post(self, title, content, categories=None, tags=None):
         # format the content
-        formatted_content = ask_gpt(html_formatter_prompts + content, chatbot=self.chatbot)
+        formatted_content = ask_gpt(html_formatter_prompts + content)
         data = {
             "status": "publish",
             "title": title,
@@ -162,7 +161,7 @@ def get_gpt_metalabeling(content):
         'Give me the response as json: {"categories": ["catergory1", "category2", …], "tags": ["tag1", "tag2", …]} and nothing else. ' 
         "Post is:\n"
     )
-    response = ask_gpt(smart_tags_prompt + content, chatbot=get_new_chatbot())
+    response = ask_gpt(smart_tags_prompt + content)
     result = json.loads(response)
     return result
 

@@ -35,7 +35,7 @@ class NewsReactor(AiLive):
 def main():
     alive_bot = NewsReactor(prompt=jerry_seinfeld_prompt,
                             v_name="Jerry Seinfeld GPT",
-                            sleep_seconds=60)
+                            sleep_seconds=10)
     alive_bot.run_forever()
 
 

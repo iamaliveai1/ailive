@@ -6,9 +6,9 @@ import logbook
 
 from ailive.actions.executors import execute_social_media_func
 from ailive.actions.plugins.base import AlivePlugin
-from ailive.engine.chatgpt.chatgpt_api import ask_gpt
+from ailive.engine.chatgpt.chatgpt_api import ask_gpt, get_chatbot, get_new_chatbot
 from ailive.engine.chatgpt.extractor import extract_args
-from revChatGPT.V1 import Error
+from revChatGPT.typing import Error
 
 _logger = logbook.Logger(__name__)
 
@@ -23,9 +23,11 @@ class AiLive(metaclass=ABCMeta):
         self.journal = []
         self.last_notifications = []
         self.new_journal_size_threshold = 0
-        self.prompts_initialized = False
         self.register_plugins(self.get_plugins())
         self.v_name = v_name
+        self.chatbot = get_new_chatbot(version="v4", min_time_between_requests=600)
+        _logger.info("Starting AiLive application")
+        _logger.info("#" * 50)
 
     @abstractmethod
     def get_plugins(self):
@@ -59,13 +61,13 @@ class AiLive(metaclass=ABCMeta):
                 break
 
     def run_once(self):
-        if not self.prompts_initialized:
-            self.init()
+        # self.init()
         # notify the AI engine about recent notifications
         answer = self.notify_notifications()
         if answer:
             self.execute_response(answer)
-            self.manage_journal(answer)
+            # self.update_journal(answer)
+            self.post_journal(answer)
         self._sleep()
         self.iteration += 1
 
@@ -74,30 +76,21 @@ class AiLive(metaclass=ABCMeta):
         starts a conversation with ChatGPT by sending the initial prompt
         :return: the first answer from the AI engine
         """
-        _logger.info("Starting AiLive application")
-        _logger.info("#" * 50)
-        _logger.info("Starting conversation with ChatGPT")
+        _logger.info("Restarting conversation with ChatGPT")
         _logger.info("#" * 50)
         answer = ask_gpt(self.prompt)
         assert answer and len(answer) > 0
         _logger.info(f"prompt created successfully")
         _logger.info(f"prompt response: {answer}")
-        self.prompts_initialized = True
 
-    def manage_journal(self, answer):
-        """
-        this method manages the journal of journey done by the AI engine
-        it records its actions in a way that can be later used to post a blog
-        :param answer:
-        :return:
-        """
-        # update the journal with gpt response
-        self.update_journal(message=f"{answer}")
-        # count the total number of words in the journal
-        total_words = sum([len(message.split()) for message in self.journal])
-        if total_words > self.new_journal_size_threshold:
-            self.post_journal()
-            self.journal = []
+    # def post_and_clean_journal(self):
+    #     # count the total number of words in the journal
+    #     total_words = sum([len(message.split()) for message in self.journal])
+    #     if total_words > self.new_journal_size_threshold:
+    #         self.post_journal()
+    #     else:
+    #         _logger.warn(f"journal is too small ({total_words} words), not posting it")
+    #     self.journal = []
 
     def _sleep(self):
         _logger.info(f"sleeping for {self.sleep_seconds} seconds...")
@@ -110,9 +103,10 @@ class AiLive(metaclass=ABCMeta):
         if not self.last_notifications:
             return None
         message = f"{self.last_notifications}"
+        # message = "\n".join(self.last_notifications)
         # self.update_journal(message=message)
         # push the notifications to the AI engine
-        answer = ask_gpt(message)
+        answer = ask_gpt(self.prompt + message, chatbot=self.chatbot)
         return answer
 
     def _collect_notifications(self):
@@ -146,7 +140,7 @@ class AiLive(metaclass=ABCMeta):
             func_name, args = extract_args(action)
             execute_social_media_func(func_name, args)
 
-    def post_journal(self):
+    def post_journal(self, content):
         _logger.info("posting journal to wordpress...")
         for plugin in self.plugins:
             if plugin.can_post:
@@ -154,11 +148,17 @@ class AiLive(metaclass=ABCMeta):
                 title = f'{datetime.now().strftime("%Y-%m-%d %H:%M")} {self.v_name} Reacts to "{notifications_str}"'
                 plugin.create_post(
                     title=title,
-                    content="<br><br>".join(self.journal),
+                    content=content,
                     categories=[self.v_name],
                     tags=[self.v_name],
                 )
 
     def update_journal(self, message):
+        """
+         this method manages the journal of journey done by the AI engine
+         it records its actions in a way that can be later used to post a blog
+         :param message:
+         :return:
+         """
         _logger.info(f"updating internal journal with {message}")
         self.journal.append(message)

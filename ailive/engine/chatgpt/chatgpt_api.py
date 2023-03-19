@@ -11,12 +11,12 @@ import time
 from http import HTTPStatus
 
 import logbook
-from ailive.infra import log_config  # noqa: F401
-from revChatGPT.V1 import Chatbot, Error
 
-from revChatGPT.V1 import ErrorType
-from ailive.engine.chatgpt.mocks import get_mock_chatbot
 from ailive.config import settings
+from ailive.engine.chatgpt.mocks import get_mock_chatbot
+from ailive.infra import log_config  # noqa: F401
+from revChatGPT.V1 import ErrorType
+from revChatGPT.typing import Error
 
 _logger = logbook.Logger(__name__)
 
@@ -31,21 +31,41 @@ if mock is False and (not email or not password):
                     "Place them in settings.yaml or set them as environment variables")
 
 
-def get_new_chatbot():
+def get_new_chatbot(version=None, min_time_between_requests=60):
     if mock:
         return get_mock_chatbot()
-    print(f"Creating new chatbot with login details: {email}, {password}")
-    return Chatbot(config={
-        # "email": email,
-        # "password": password,
-        "access_token": chatgpt_cfg.access_token,
-    })
+    print(f"Creating new chatbot... (version: {version})")
+    if version is None:
+        version = chatgpt_cfg.version
+    if version == "v1":
+        from revChatGPT.V1 import Chatbot
+        chatbot = Chatbot(config={
+            "access_token": chatgpt_cfg.access_token,
+        })
+    elif version == "v3":
+        from revChatGPT.V3 import Chatbot
+        chatbot = Chatbot(
+            api_key=chatgpt_cfg.api_key,
+            system_prompt="",
+        )
+    elif version == "v4":
+        from revChatGPT.V1 import Chatbot
+        chatbot = Chatbot(config={
+            "access_token": chatgpt_cfg.access_token,
+            "model": "gpt-4"
+        })
+    else:
+        raise Exception(f"Unknown chatgpt version: {chatgpt_cfg.version}")
+    chatbot.min_time_between_requests = min_time_between_requests
+    chatbot.last_request_time = time.time() - min_time_between_requests
+    return chatbot
 
 
 class RotatingChatbot:
     """
     This class is a wrapper for the Chatbot class, which rotates the chatbot when it encounters an error.
     """
+
     def __init__(self):
         try:
             self.chatbot = get_new_chatbot()
@@ -55,11 +75,15 @@ class RotatingChatbot:
             raise e
 
     def rotate_chatbot(self):
+        _logger.info("Rotating chatbot")
         self.chatbot = get_new_chatbot()
 
 
 chatbot_wrapper = RotatingChatbot()
-last_request_time = None
+
+
+def get_chatbot():
+    return chatbot_wrapper.chatbot
 
 
 def ask_gpt_long_content(content: list, prompt, delete_conversation=True):
@@ -140,13 +164,13 @@ def _slice_partial_content(content, max_request_size):
         yield paragraph
 
 
-def ask_gpt(prompt, chatbot=None, attempts=2):
+def ask_gpt(prompt, chatbot=None, attempts=2, cleanup=False):
     _logger.info(f"===================\n")
     _logger.info(f"Asking GPT:\n{prompt}")
-    _wait_on_rate_limit()
     try:
         if chatbot is None:
             chatbot = chatbot_wrapper.chatbot
+        _wait_on_rate_limit(chatbot)
         if prompt == "":
             _logger.error("ask_gpt: prompt is empty")
             return ""
@@ -159,7 +183,12 @@ def ask_gpt(prompt, chatbot=None, attempts=2):
                 message="Empty response from GPT",
                 code=ErrorType.EMPTY_RESPONSE
             )
-        answer = result[-1]["message"]
+        if chatgpt_cfg.version == "v1":
+            answer = result[-1]["message"]
+        elif chatgpt_cfg.version == "v3":
+            answer = "".join(result)
+        else:
+            raise Exception(f"Unknown chatgpt version: {chatgpt_cfg.version}")
         _logger.info(
             f"prompt: {prompt[:100]}...\n"
             f"-------------------\n"
@@ -167,6 +196,11 @@ def ask_gpt(prompt, chatbot=None, attempts=2):
             f"answer len: {len(answer)}\n"
             f"answer: {answer}...\n"
             f"===================")
+        if cleanup and hasattr(chatbot, "conversation_id"):
+            # cleanup the conversation, allowing following methods to start a new conversation
+            _logger.info(f"deleting conversation {chatbot_wrapper.chatbot.conversation_id}...")
+            chatbot_wrapper.chatbot.delete_conversation(chatbot_wrapper.chatbot.conversation_id)
+            chatbot_wrapper.chatbot.reset_chat()
         return answer
     except Error as e:
         retry = False
@@ -196,7 +230,7 @@ def ask_gpt(prompt, chatbot=None, attempts=2):
         raise e
 
 
-def _wait_on_rate_limit(min_time_between_requests=30):
+def _wait_on_rate_limit(chatbot):
     """
     This method waits for min_time_between_requests seconds between requests to the ChatGPT API
     :param min_time_between_requests:
@@ -204,7 +238,10 @@ def _wait_on_rate_limit(min_time_between_requests=30):
     """
     if mock:
         return
-    global last_request_time
+    min_time_between_requests = chatbot.min_time_between_requests
+    assert hasattr(chatbot, "last_request_time")
+
+    last_request_time = chatbot.last_request_time
     if last_request_time is not None:
         time_since_last_request = time.time() - last_request_time
         wait_time = min_time_between_requests - time_since_last_request
@@ -212,4 +249,17 @@ def _wait_on_rate_limit(min_time_between_requests=30):
             _logger.info(f"GPT-RATE-LIMIT: waiting {wait_time} seconds")
             time.sleep(wait_time)
             _logger.info(f"GPT-RATE-LIMIT: done waiting")
-    last_request_time = time.time()
+    chatbot.last_request_time = time.time()
+
+
+def delete_previos_conversations():
+    import time
+    chatbot = get_chatbot()
+    conversations = chatbot.get_conversations()
+    for conversation in conversations:
+        if conversation['title'] == 'New chat':
+            chatbot.delete_conversation(conversation['id'])
+            print(f"Deleted conversation {conversation['id']} - {conversation['title']}")
+            waiting_time = 2  # Wait for 1 second before proceeding to the next conversation
+            print(f"Waiting for {waiting_time} second(s)...")
+            time.sleep(waiting_time)

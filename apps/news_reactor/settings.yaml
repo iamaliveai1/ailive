@@ -2,6 +2,7 @@ chatgpt:
   email: "email@gmail.com"
   password: "password"
   access_token: "<access_token>"
+  version: "v1"
 
 plugins:
   wordpress1:
