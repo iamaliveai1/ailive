@@ -137,8 +137,8 @@ class AiLive(metaclass=ABCMeta):
             if "(" not in action:
                 continue
             _logger.info(f"executing action: {action}")
-            func_name, args = extract_args(action)
-            execute_social_media_func(func_name, args)
+            # func_name, args = extract_args(action)
+            # execute_social_media_func(func_name, args)
 
     def post_journal(self, content):
         _logger.info("posting journal to wordpress...")
