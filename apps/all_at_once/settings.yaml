@@ -9,7 +9,3 @@ plugins:
     base_url: "https://localhost:8080/"
     username: "wordpress"
     password: "wordpress"
-  wp_seinfeld:
-    base_url: "https://localhost:8080/"
-    username: "wordpress"
-    password: "wordpress"

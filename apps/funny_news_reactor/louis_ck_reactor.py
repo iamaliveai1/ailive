@@ -17,7 +17,7 @@ settings = Dynaconf(
 class NewsReactor(AiLive):
     def get_plugins(self):
         plugins = []
-        wp_config = settings.plugins.wordpress1
+        wp_config = settings.plugins.wp_louis_ck
         wordpress_plugin = WordPressAlivePlugin(
             base_url=wp_config.base_url,
             username=wp_config.username,

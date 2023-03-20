@@ -15,7 +15,7 @@ _logger = logbook.Logger(__name__)
 
 class AiLive(metaclass=ABCMeta):
 
-    def __init__(self, prompt, sleep_seconds=10, v_name="ChatGPT"):
+    def __init__(self, prompt, sleep_seconds=10, v_name="ChatGPT", version="v1"):
         self.prompt = prompt
         self.sleep_seconds = sleep_seconds
         self.iteration = 0
@@ -25,7 +25,7 @@ class AiLive(metaclass=ABCMeta):
         self.new_journal_size_threshold = 0
         self.register_plugins(self.get_plugins())
         self.v_name = v_name
-        self.chatbot = get_new_chatbot(version="v4", min_time_between_requests=600)
+        self.chatbot = get_new_chatbot(version=version, min_time_between_requests=600)
         _logger.info("Starting AiLive application")
         _logger.info("#" * 50)
 

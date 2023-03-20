@@ -17,7 +17,7 @@ settings = Dynaconf(
 class NewsReactor(AiLive):
     def get_plugins(self):
         plugins = []
-        wp_config = settings.plugins.wordpress1
+        wp_config = settings.plugins.wp_seinfeld
         wordpress_plugin = WordPressAlivePlugin(
             base_url=wp_config.base_url,
             username=wp_config.username,
@@ -35,6 +35,7 @@ class NewsReactor(AiLive):
 def main():
     alive_bot = NewsReactor(prompt=jerry_seinfeld_prompt,
                             v_name="Jerry Seinfeld GPT",
+                            version=settings.chatgpt.version,
                             sleep_seconds=10)
     alive_bot.run_forever()
 
