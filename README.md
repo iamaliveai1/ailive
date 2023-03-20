@@ -42,6 +42,15 @@ The project is composed of 4 main components:
 - runner: orchestrates the execution of the readers, engine and writers. This is done by running the engine (chatGPT) in a loop, allowing it to interact with the outside world
  
 
+<div align="center">
+    <img
+        src="https://readme-typing-svg.herokuapp.com?font=ShadowsIntoLightsize=50&duration=5500&color=fc7b03&background=FF673200&center=true&vCenter=true&lines=Fork+me+to+show+support"
+            alt="Typing SVG"
+        />
+    </a>
+</p>
+</div>
+
 ## 2. Installation
 ### 2.1. Install dependencies
 ```bash
@@ -87,6 +96,15 @@ docker-compose up -d
 ```
 Then, you can access the wordpress website at http://localhost:8080
  
+
+<div align="center">
+    <img
+        src="https://readme-typing-svg.herokuapp.com?font=ShadowsIntoLightsize=50&duration=5500&color=fc7b03&background=FF673200&center=true&vCenter=true&lines=Star+me+to+show+support"
+            alt="Typing SVG"
+        />
+    </a>
+</p>
+</div>
 
 ## 3. Usage
 ### 3.1. Run the server
