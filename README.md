@@ -44,7 +44,7 @@ The project is composed of 4 main components:
 
 <div align="center">
     <img
-        src="https://readme-typing-svg.herokuapp.com?font=ShadowsIntoLightsize=50&duration=5500&color=fc7b03&background=FF673200&center=true&vCenter=true&lines=Fork+me+to+show+support"
+        src="https://readme-typing-svg.herokuapp.com?font=ShadowsIntoLightsize=50&duration=5500&color=fc7b03&background=FF673200&center=true&vCenter=true&lines=If+You+Like+It+Fork+me"
             alt="Typing SVG"
         />
     </a>
@@ -99,7 +99,7 @@ Then, you can access the wordpress website at http://localhost:8080
 
 <div align="center">
     <img
-        src="https://readme-typing-svg.herokuapp.com?font=ShadowsIntoLightsize=50&duration=5500&color=fc7b03&background=FF673200&center=true&vCenter=true&lines=Star+me+to+show+support"
+        src="https://readme-typing-svg.herokuapp.com?font=ShadowsIntoLightsize=50&duration=5500&color=fc7b03&background=FF673200&center=true&vCenter=true&lines=If+You+Like+It+Star+me"
             alt="Typing SVG"
         />
     </a>
