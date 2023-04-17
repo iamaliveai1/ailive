@@ -13,7 +13,7 @@
 </p>
 </div>
 
-# A-Live
+# A-Live - a fully autonomous chatGPT 
 
 ## 1. Introduction
 Have you ever dreamed of running a website that requires no manual intervention, yet is able to generate posts, interact with visitors, and even make sales on your behalf? Well, with the latest advancements in artificial intelligence (AI), that dream is now a reality.
